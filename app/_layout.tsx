@@ -1,37 +1,47 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
+import { Stack, Slot, SplashScreen } from 'expo-router';
+import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo';
+import { LogBox } from 'react-native';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { tokenCache } from '@/utils/cache';
+import {
+	useFonts,
+	DMSans_400Regular,
+	DMSans_700Bold,
+	DMSans_400Regular_Italic,
+} from '@expo-google-fonts/dm-sans';
+export * as SplashScreen from 'expo-splash-screen';
+const clerkPublisherKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+if (!clerkPublisherKey) {
+	throw new Error(
+		'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env'
+	);
+}
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+LogBox.ignoreLogs(['Clerk: Clerk has been loaded with development keys']);
 SplashScreen.preventAutoHideAsync();
+const InitialLayout = () => {
+	const [fontsLoaded] = useFonts({
+		DMSans_400Regular,
+		DMSans_700Bold,
+		DMSans_400Regular_Italic,
+	});
 
+	if (!fontsLoaded) {
+		return null;
+	}
+
+	if (fontsLoaded) {
+		SplashScreen.hideAsync();
+	}
+
+	return <Slot />;
+};
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
-  );
+	return (
+		<ClerkProvider publishableKey={clerkPublisherKey!} tokenCache={tokenCache}>
+			<ClerkLoaded>
+				<InitialLayout />
+			</ClerkLoaded>
+		</ClerkProvider>
+	);
 }

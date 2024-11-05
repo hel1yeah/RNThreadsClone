@@ -6,14 +6,18 @@ import {
 	ScrollView,
 	TouchableOpacity,
 } from 'react-native';
+import { api } from '@/convex/_generated/api';
 import { Ionicons } from '@expo/vector-icons';
 import { useOAuth } from '@clerk/clerk-expo';
 import { Colors } from '@/constants/Colors';
+import { useQuery } from 'convex/react';
 export default function Index() {
 	const { startOAuthFlow } = useOAuth({ strategy: 'oauth_facebook' });
 	const { startOAuthFlow: startGoogleOAuthFlow } = useOAuth({
 		strategy: 'oauth_google',
 	});
+	const users = useQuery(api.users.getAllUsers);
+	console.log(users);
 
 	const handleContinueWithInstagram = async () => {
 		try {
@@ -24,7 +28,7 @@ export default function Index() {
 				setActive!({ session: createdSessionId });
 			}
 		} catch (error) {
-			console.log(error);
+			console.log('error', error);
 		}
 	};
 

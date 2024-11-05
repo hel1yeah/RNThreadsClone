@@ -11,6 +11,7 @@ import {
 } from '@expo-google-fonts/dm-sans';
 export * as SplashScreen from 'expo-splash-screen';
 const clerkPublisherKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 if (!clerkPublisherKey) {
 	throw new Error(
 		'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env'
@@ -18,6 +19,7 @@ if (!clerkPublisherKey) {
 }
 
 LogBox.ignoreLogs(['Clerk: Clerk has been loaded with development keys']);
+// Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 const InitialLayout = () => {
 	const [fontsLoaded] = useFonts({
@@ -26,11 +28,13 @@ const InitialLayout = () => {
 		DMSans_400Regular_Italic,
 	});
 
+	useEffect(() => {
+		SplashScreen.preventAutoHideAsync();
+	}, [fontsLoaded]);
+
 	if (!fontsLoaded) {
 		return null;
-	}
-
-	if (fontsLoaded) {
+	} else {
 		SplashScreen.hideAsync();
 	}
 

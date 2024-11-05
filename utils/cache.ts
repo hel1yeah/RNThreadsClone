@@ -1,13 +1,13 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-export interface TokenCache {
+export interface ITokenCache {
 	getToken: (key: string) => Promise<string | undefined | null>;
 	saveToken: (key: string, token: string) => Promise<void>;
 	clearToken?: (key: string) => void;
 }
 
-const createTokenCache = (): TokenCache => {
+const createTokenCache = (): ITokenCache => {
 	return {
 		async getToken(key: string) {
 			try {

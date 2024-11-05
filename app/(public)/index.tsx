@@ -18,7 +18,7 @@ export default function Index() {
 	const handleContinueWithInstagram = async () => {
 		try {
 			const { createdSessionId, setActive } = await startOAuthFlow();
-			console.log(createdSessionId);
+			console.log('createdSessionId', createdSessionId);
 
 			if (createdSessionId) {
 				setActive!({ session: createdSessionId });
